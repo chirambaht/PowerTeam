@@ -5,16 +5,17 @@
 //https://stackoverflow.com/questions/1674032/static-const-vs-define-vs-enum
 
 // Function definitions
-int hFormat(int hours);
-void lightHours(int units);
-void lightMins(int units);
-int hexCompensation(int units);
-int decCompensation(int units);
-void initGPIO(void);
-void secPWM(int units);
-void hourInc(void);
-void minInc(void);
-void toggleTime(void);
+int hFormat(int hours); //Done
+void lightHours(int units); //Tatenda
+void lightMins(int units); //Tatenda
+int hexCompensation(int units); //Done
+int decCompensation(int units); //Done
+void initGPIO(void); //Tatenda
+void secPWM(int units); //Tatenda
+void hourInc(void); //Humphrey
+void minInc(void); //Humphrey
+void toggleTime(void); //Done
+// Main function //Humphrey
 
 // define constants
 const char RTCAddr = 0x6f;
