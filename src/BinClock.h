@@ -12,8 +12,8 @@ int hexCompensation(int units); //Done
 int decCompensation(int units); //Done
 void initGPIO(void); //Tatenda
 void secPWM(int units); //Tatenda
-void hourInc(void); //Humphrey
-void minInc(void); //Humphrey
+void hourInc(void); //Humphrey -- done?
+void minInc(void); //Humphrey -- done?
 void toggleTime(void); //Done
 // Main function //Humphrey
 

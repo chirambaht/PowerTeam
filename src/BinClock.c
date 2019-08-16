@@ -64,23 +64,17 @@ void initGPIO(void){
  */
 int main(void){
 
-	int i = 0;
-
-	while (i < 12){
-	minInc();
-	i++;
-	}
-
 	initGPIO();
 
-	//Set random time (3:04PM)
+	//Set random time (3:54PM)
 	//You can comment this file out later
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
-	wiringPiI2CWriteReg8(RTC, MIN, 0x4);
+	wiringPiI2CWriteReg8(RTC, MIN, 0x54);
 	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
 	
 	// Repeat this until we shut down
 	for (;;){
+		minInc();
 		//Fetch the time from the RTC
 		//Write your logic here
 		
