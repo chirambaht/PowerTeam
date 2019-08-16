@@ -219,15 +219,15 @@ void minInc(void){
 		printf("Interrupt 2 triggered, %x\n", mins);
 		//Fetch RTC Time
 		int temp = wiringPiI2CReadReg8(RTC, MIN);
-		printf("Temp value: %d",temp);
+		printf("Temp value: %d\n",temp);
 		//Increase minutes by 1, ensuring not to overflow
 		mins = decCompensation(mins);
-		printf("Now min value: %d",mins);
+		printf("Now min value: %d\n",mins);
 		mins++;
-		printf("Upped min value: %d",mins);
+		printf("Upped min value: %d\n",mins);
 		temp = hexCompensation(mins);
 		//Write minutes back to the RTC
-		printf("Write value: %d",temp);
+		printf("Write value: %d\n",temp);
 		wiringPiI2CWriteReg8(RTC, MIN, temp);
 	}
 	lastInterruptTime = interruptTime;
