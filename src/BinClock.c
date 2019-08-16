@@ -74,12 +74,13 @@ int main(void){
 	
 	// Repeat this until we shut down
 	for (;;){
-		minInc();
 		//Fetch the time from the RTC
-		//Write your logic here
+		mins = wiringPiI2CReadReg8(RTC, MIN);
+		hours = wiringPiI2CWriteReg8(RTC, HOUR);
+		secs = wiringPiI2CWriteReg8(RTC, SEC);
 		
 		//Function calls to toggle LEDs
-		//Write your logic here
+		
 		
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
