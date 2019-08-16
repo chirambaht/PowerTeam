@@ -63,6 +63,9 @@ void initGPIO(void){
  * This function is called, and calls all relevant functions we've written
  */
 int main(void){
+
+	minInc();
+
 	initGPIO();
 
 	//Set random time (3:04PM)
@@ -188,12 +191,15 @@ int decCompensation(int units){
  * Software Debouncing should be used
  */
 void hourInc(void){
+	//bFsR4Ct7HgGu
 	//Debounce
 	long interruptTime = millis();
 
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 1 triggered, %x\n", hours);
 		//Fetch RTC Time
+		wiringPiI2CReadReg8(REG, int reg) 
+
 		//Increase hours by 1, ensuring not to overflow
 		//Write hours back to the RTC
 	}
@@ -212,8 +218,17 @@ void minInc(void){
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 2 triggered, %x\n", mins);
 		//Fetch RTC Time
+		int temp = wiringPiI2CReadReg8(RTC, MIN);
+		printf("Temp value: %d",temp);
 		//Increase minutes by 1, ensuring not to overflow
+		mins = decCompensation(mins);
+		printf("Now min value: %d",mins);
+		mins++;
+		printf("Upped min value: %d",mins);
+		temp = hexCompensation(mins);
 		//Write minutes back to the RTC
+		printf("Write value: %d",temp);
+		wiringPiI2CWriteReg8(RTC, MIN, temp);
 	}
 	lastInterruptTime = interruptTime;
 }
