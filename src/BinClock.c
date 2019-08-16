@@ -68,7 +68,7 @@ int main(void){
 
 	while (i < 12){
 	minInc();
-	i++
+	i++;
 	}
 
 	initGPIO();
