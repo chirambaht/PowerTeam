@@ -198,7 +198,7 @@ void hourInc(void){
 	if (interruptTime - lastInterruptTime>200){
 		printf("Interrupt 1 triggered, %x\n", hours);
 		//Fetch RTC Time
-		wiringPiI2CReadReg8(REG, int reg) 
+		//wiringPiI2CReadReg8(REG, int reg) 
 
 		//Increase hours by 1, ensuring not to overflow
 		//Write hours back to the RTC
