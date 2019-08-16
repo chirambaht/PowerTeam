@@ -207,12 +207,12 @@ void hourInc(void){
 		//Increase hours by 1, ensuring not to overflow
 		hours = decCompensation(temp);
 		hours++;
+		if (hours == 24){
+			hours = 0;
+		}
 		temp = hexCompensation(hours);
-		//Write hpurs back to the RTC
-		wiringPiI2CWriteReg8(RTC, HOUR, temp);
-
-		//Increase hours by 1, ensuring not to overflow
 		//Write hours back to the RTC
+		wiringPiI2CWriteReg8(RTC, HOUR, temp);
 	}
 	lastInterruptTime = interruptTime;
 }
@@ -234,6 +234,10 @@ void minInc(void){
 		mins = decCompensation(temp);
 		printf("mid: %d\n",temp);
 		mins++;
+		if (mins == 60){
+			hourInc();
+			mins = 0;
+		}
 		temp = hexCompensation(mins);
 		printf("final: %d\n",mins);
 		//Write minutes back to the RTC
