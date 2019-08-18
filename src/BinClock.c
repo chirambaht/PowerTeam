@@ -20,8 +20,6 @@
 int hours, mins, secs;
 long lastInterruptTime = 0; //Used for button debounce
 int RTC; //Holds the RTC instance
-int state = 1;
-
 
 int HH,MM,SS;
 
@@ -104,10 +102,6 @@ int main(void){
 		
 		//Function calls to toggle LEDs
 		//Write your logic here
-		
-		lightMins(mins);
-		lightHours(hours);
-		secPWM(secs);
 	
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
