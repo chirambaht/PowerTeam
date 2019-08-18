@@ -20,39 +20,63 @@
 int hours, mins, secs;
 long lastInterruptTime = 0; //Used for button debounce
 int RTC; //Holds the RTC instance
+int state = 1;
+
 
 int HH,MM,SS;
 
+void int_to_bin_digit(unsigned int in, int count, int* out)
+{
+    /* assert: count <= sizeof(int)*CHAR_BIT */
+    unsigned int mask = 1U << (count-1);
+    int i;
+    for (i = 0; i < count; i++) {
+        out[i] = (in & mask) ? 1 : 0;
+        in <<= 1;
+    }
+}
+
+
 void initGPIO(void){
-	/* 
+	/*
 	 * Sets GPIO using wiringPi pins. see pinout.xyz for specific wiringPi pins
 	 * You can also use "gpio readall" in the command line to get the pins
 	 * Note: wiringPi does not use GPIO or board pin numbers (unless specifically set to that mode)
 	 */
 	printf("Setting up\n");
-	wiringPiSetup(); //This is the default mode. If you want to change pinouts, be aware
-	
+	if (wiringPiSetup() == -1){ //This is the default mode. If you want to change pinouts, be aware
+		printf("setting up wiring pi failed");
+    }
 	RTC = wiringPiI2CSetup(RTCAddr); //Set up the RTC
-	
+
 	//Set up the LEDS
-	for(int i; i < sizeof(LEDS)/sizeof(LEDS[0]); i++){
+	for(int i = 0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++){
 	    pinMode(LEDS[i], OUTPUT);
+		digitalWrite(LEDS[i], LOW);
 	}
-	
+
 	//Set Up the Seconds LED for PWM
 	//Write your logic here
-	
+
 	printf("LEDS done\n");
-	
+
 	//Set up the Buttons
-	for(int j; j < sizeof(BTNS)/sizeof(BTNS[0]); j++){
-		pinMode(BTNS[j], INPUT);
-		pullUpDnControl(BTNS[j], PUD_UP);
+	pinMode(BTNS[0], INPUT);
+	pullUpDnControl(BTNS[0], PUD_UP);
+	if (wiringPiISR(BTNS[0], INT_EDGE_FALLING,&minInc) != 0){
+			printf("registering isr for button %x failed \n", BTNS[0]);
 	}
 	
+	pinMode(BTNS[1], INPUT);
+	pullUpDnControl(BTNS[1], PUD_UP);
+	if (wiringPiISR(BTNS[1], INT_EDGE_FALLING,&hourInc) != 0){
+			printf("registering isr for button %x failed \n", BTNS[1]);
+	}
+
 	//Attach interrupts to Buttons
-	//Write your logic here
 	
+	//Write your logic here
+
 	printf("BTNS done\n");
 	printf("Setup done\n");
 }
@@ -62,6 +86,7 @@ void initGPIO(void){
  * The main function
  * This function is called, and calls all relevant functions we've written
  */
+ 
 int main(void){
 	initGPIO();
 
@@ -70,14 +95,19 @@ int main(void){
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
 	wiringPiI2CWriteReg8(RTC, MIN, 0x4);
 	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
-	
 	// Repeat this until we shut down
+
 	for (;;){
 		//Fetch the time from the RTC
 		//Write your logic here
 		
 		//Function calls to toggle LEDs
 		//Write your logic here
+		
+		lightMins(mins);
+		lightHours(hours);
+		secPWM(secs);
+	
 		
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
@@ -107,6 +137,12 @@ int hFormat(int hours){
  */
 void lightHours(int units){
 	// Write your logic to light up the hour LEDs here	
+	int hourArray[4];
+	int_to_bin_digit(units, 4, hourArray);
+	
+	for (int i = 0; i < 4; i++){
+		digitalWrite(LEDS[i], hourArray[i]);
+	}
 }
 
 /*
@@ -114,6 +150,14 @@ void lightHours(int units){
  */
 void lightMins(int units){
 	//Write your logic to light up the minute LEDs here
+	int minuteArray[6];
+	int_to_bin_digit(units, 6, minuteArray);
+	
+	for (int i = 0; i < 6; i++){
+		digitalWrite(LEDS[i+4], minuteArray[i]);
+	}
+	
+	
 }
 
 /*
