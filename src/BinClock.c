@@ -88,29 +88,23 @@ void initGPIO(void){
  
 int main(void){
 
-	int i = 0;
-
-	while (i < 12){
-	minInc();
-	i++;
-	}
-
 	initGPIO();
 
-	//Set random time (3:04PM)
+	//Set random time (3:54PM)
 	//You can comment this file out later
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
-	wiringPiI2CWriteReg8(RTC, MIN, 0x4);
+	wiringPiI2CWriteReg8(RTC, MIN, 0x54);
 	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
 	// Repeat this until we shut down
 
 	for (;;){
 		//Fetch the time from the RTC
-		//Write your logic here
+		mins = wiringPiI2CReadReg8(RTC, MIN);
+		hours = wiringPiI2CWriteReg8(RTC, HOUR);
+		secs = wiringPiI2CWriteReg8(RTC, SEC);
 		
 		//Function calls to toggle LEDs
-		//Write your logic here
-	
+
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
 
@@ -268,18 +262,15 @@ void minInc(void){
 
 	if (interruptTime - lastInterruptTime>200){
 		//Fetch RTC Time
-		printf("initial: %d\n",mins);
 		int temp = wiringPiI2CReadReg8(RTC, MIN);
 		//Increase minutes by 1, ensuring not to overflow
 		mins = decCompensation(temp);
-		printf("mid: %d\n",temp);
 		mins++;
 		if (mins == 60){
 			hourInc();
 			mins = 0;
 		}
 		temp = hexCompensation(mins);
-		printf("final: %d\n",mins);
 		//Write minutes back to the RTC
 		wiringPiI2CWriteReg8(RTC, MIN, temp);
 	}
