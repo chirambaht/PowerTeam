@@ -12,7 +12,6 @@
 #include <wiringPiI2C.h>
 #include <stdio.h> //For printf functions
 #include <stdlib.h> // For system functions
-
 #include "BinClock.h"
 #include "CurrentTime.h"
 
@@ -80,6 +79,14 @@ void initGPIO(void){
 	printf("Setup done\n");
 }
 
+int  DecimalToBCD (int Decimal){
+   return (((Decimal/10) << 4) | (Decimal % 10));
+}
+
+int BCDToDecimal(int BCD){
+   return (((BCD>>4)*10) + (BCD & 0xF));
+}
+
 
 /*
  * The main function
@@ -89,46 +96,29 @@ void initGPIO(void){
 int main(void){
 
 	initGPIO();
-
+	
+	
 	//Set random time (3:54PM)
 	//You can comment this file out later
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
-	wiringPiI2CWriteReg8(RTC, MIN, 0x04);
-	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
+	wiringPiI2CWriteReg8(RTC, MIN, 0x54);
+	//wiringPiI2CWriteReg8(RTC, SEC, 0x80);
+	wiringPiI2CWriteReg8(RTC, SEC, 0b10000000+12);
 	// Repeat this until we shut down
 
 	for (;;){
 		//Fetch the time from the RTC
-		mins = decCompensation(wiringPiI2CReadReg8(RTC, MIN));
-		hours = decCompensation(wiringPiI2CReadReg8(RTC, HOUR));
-		secs = decCompensation(wiringPiI2CReadReg8(RTC, SEC));
+		mins = BCDToDecimal(wiringPiI2CReadReg8(RTC, MIN) & 0b01111111);
+		hours = BCDToDecimal(wiringPiI2CReadReg8(RTC, HOUR) & 0b00011111);
+		secs = BCDToDecimal(wiringPiI2CReadReg8(RTC, SEC) & 0b01111111);
 		
 		//Function calls to toggle LEDs
-		
-		
-		secs++;
-		
-		if (secs == 60){
-			secs = 0;
-			mins++;
-		}
-		
-		if (mins == 60){
-			mins = 0;
-			hours++;
-		}
-		
-		if (hours == 20){
-			hours = 0;
-		}
-		
-		secPWM(secs);
 		lightHours(hours);
 		lightMins(mins);
 		secPWM(secs);
 		
 		// Print out the time we have stored on our RTC
-		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
+		printf("The current time is: %d:%d:%d\n", hours, mins, secs);
 
 		//using a delay to make our program "less CPU hungry"
 		delay(1000); //milliseconds
@@ -219,6 +209,9 @@ int hexCompensation(int units){
 }
 
 
+
+
+
 /*
  * decCompensation
  * This function "undoes" hexCompensation in order to write the correct base 16 value through I2C
@@ -260,12 +253,12 @@ void hourInc(void){
 		//Fetch RTC Time
 		int temp = wiringPiI2CReadReg8(RTC, HOUR);
 		//Increase hours by 1, ensuring not to overflow
-		hours = decCompensation(temp);
+		hours = BCDToDecimal(temp);
 		hours++;
 		if (hours == 24){
 			hours = 0;
 		}
-		temp = hexCompensation(hours);
+		temp = BCDToDecimal(hours);
 		//Write hours back to the RTC
 		wiringPiI2CWriteReg8(RTC, HOUR, temp);
 	}
@@ -285,13 +278,13 @@ void minInc(void){
 		//Fetch RTC Time
 		int temp = wiringPiI2CReadReg8(RTC, MIN);
 		//Increase minutes by 1, ensuring not to overflow
-		mins = decCompensation(temp);
+		mins = BCDToDecimal(temp);
 		mins++;
 		if (mins == 60){
 			hourInc();
 			mins = 0;
 		}
-		temp = hexCompensation(mins);
+		temp = BCDToDecimal(mins);
 		//Write minutes back to the RTC
 		wiringPiI2CWriteReg8(RTC, MIN, temp);
 	}
