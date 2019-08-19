@@ -93,7 +93,7 @@ int main(void){
 	//Set random time (3:54PM)
 	//You can comment this file out later
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
-	wiringPiI2CWriteReg8(RTC, MIN, 0x54);
+	wiringPiI2CWriteReg8(RTC, MIN, 0x04);
 	wiringPiI2CWriteReg8(RTC, SEC, 0x00);
 	// Repeat this until we shut down
 
@@ -104,10 +104,29 @@ int main(void){
 		secs = wiringPiI2CReadReg8(RTC, SEC);
 		
 		//Function calls to toggle LEDs
+		
+		
+		secs++;
+		
+		if (secs == 60){
+			secs = 0;
+			mins++
+		}
+		
+		if (mins == 60){
+			mins = 0;
+			hours++;
+		}
+		
+		if (hours == 20){
+			hours = 0;
+		}
+		
+		secPWM(secs);
 		lightHours(hours);
 		lightMins(mins);
 		secPWM(secs);
-
+		
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
 
@@ -233,12 +252,11 @@ int decCompensation(int units){
  * Software Debouncing should be used
  */
 void hourInc(void){
-	//bFsR4Ct7HgGu
 	//Debounce
 	long interruptTime = millis();
 
 	if (interruptTime - lastInterruptTime>200){
-		printf("Interrupt 1 triggered, %x\n", hours);
+// 		printf("Interrupt 1 triggered, %x\n", hours);
 		//Fetch RTC Time
 		int temp = wiringPiI2CReadReg8(RTC, HOUR);
 		//Increase hours by 1, ensuring not to overflow
