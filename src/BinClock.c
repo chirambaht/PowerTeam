@@ -110,7 +110,7 @@ int main(void){
 		
 		if (secs == 60){
 			secs = 0;
-			mins++
+			mins++;
 		}
 		
 		if (mins == 60){
