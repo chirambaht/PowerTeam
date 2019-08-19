@@ -104,6 +104,9 @@ int main(void){
 		secs = wiringPiI2CWriteReg8(RTC, SEC);
 		
 		//Function calls to toggle LEDs
+		lightHours(hours);
+		lightMins(mins);
+		secPWM(secs);
 
 		// Print out the time we have stored on our RTC
 		printf("The current time is: %x:%x:%x\n", hours, mins, secs);
