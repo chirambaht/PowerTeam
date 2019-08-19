@@ -100,8 +100,8 @@ int main(void){
 	for (;;){
 		//Fetch the time from the RTC
 		mins = wiringPiI2CReadReg8(RTC, MIN);
-		hours = wiringPiI2CWriteReg8(RTC, HOUR);
-		secs = wiringPiI2CWriteReg8(RTC, SEC);
+		hours = wiringPiI2CReadReg8(RTC, HOUR);
+		secs = wiringPiI2CReadReg8(RTC, SEC);
 		
 		//Function calls to toggle LEDs
 		lightHours(hours);
