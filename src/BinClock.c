@@ -24,7 +24,6 @@ int HH,MM,SS;
 
 void int_to_bin_digit(unsigned int in, int count, int* out)
 {
-    /* assert: count <= sizeof(int)*CHAR_BIT */
     unsigned int mask = 1U << (count-1);
     int i;
     for (i = 0; i < count; i++) {
@@ -36,7 +35,6 @@ void int_to_bin_digit(unsigned int in, int count, int* out)
 void initGPIO(void){
 	/*
 	 * Sets GPIO using wiringPi pins. see pinout.xyz for specific wiringPi pins
-	 * You can also use "gpio readall" in the command line to get the pins
 	 * Note: wiringPi does not use GPIO or board pin numbers (unless specifically set to that mode)
 	 */
 	printf("Setting up\n");
@@ -66,14 +64,11 @@ void initGPIO(void){
 	
 	pinMode(BTNS[1], INPUT);
 	pullUpDnControl(BTNS[1], PUD_UP);
-	if (wiringPiISR(BTNS[1], INT_EDGE_FALLING,&hourInc) != 0){
+	if (wiringPiISR(BTNS[1], INT_EDGE_FALLING,&hourInc) != 0){//register and set up button interupts
 			printf("registering isr for button %x failed \n", BTNS[1]);
 	}
 
-	//Attach interrupts to Buttons
 	
-	//Write your logic here
-
 	printf("BTNS done\n");
 	printf("Setup done\n");
 }
@@ -91,7 +86,6 @@ int main(void){
 	
 	
 	//Set random time (3:54PM)
-	//You can comment this file out later
 	wiringPiI2CWriteReg8(RTC, HOUR, 0x13+TIMEZONE);
 	wiringPiI2CWriteReg8(RTC, MIN, 0x54);
 	
@@ -122,7 +116,7 @@ int main(void){
 		}
 		
 		
-		secs = decCompensation(secs);
+		secs = decCompensation(secs);//read and writeback seconds
 		wiringPiI2CWriteReg8(RTC, SEC, secs);
 
 		//using a delay to make our program "less CPU hungry"
